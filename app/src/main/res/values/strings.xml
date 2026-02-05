@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MyContactList_</string>
+    <string name="togglebutton">ToggleButton</string>
+    <string name="save">Save</string>
+</resources>
