@@ -3,6 +3,7 @@ package com.example.mycontactlist_;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,20 +14,33 @@ import java.util.ArrayList;
 
 //Listing 6.2
 //Modified code in Listing 6.4
+//Modified code in Listing 6.7 for new layout
 public class ContactAdapter extends RecyclerView.Adapter {
-    private ArrayList<String> contactData;
+    private ArrayList<Contact> contactData;
     private View.OnClickListener mOnItemClickListener;
     // is "mOnItemClickListener" a typo?
 
     public class ContactViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textViewContact;
+        public TextView textPhone;
+        public Button deleteButton;
 
         public ContactViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewContact = itemView.findViewById(R.id.textViewName);
+            textPhone = itemView.findViewById(R.id.textPhoneNumber);
+            deleteButton = itemView.findViewById(R.id.buttonDeleteContact);
             itemView.setTag(this);
             itemView.setOnClickListener(mOnItemClickListener);
+        }
+        public TextView getPhoneTextView(){
+
+            return textPhone;
+        }
+        public Button getDeleteButton(){
+
+            return deleteButton;
         }
 
     public TextView getContactTextView() {
@@ -50,7 +64,9 @@ public class ContactAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ContactViewHolder cvh = (ContactViewHolder) holder;
-        cvh.getContactTextView().setText(contactData.get(position));
+        cvh.getContactTextView().setText(contactData.get(position).getContactName());
+        cvh.getPhoneTextView().setText(contactData.get(position).getPhoneNumber);
+
     }
     @Override
     public int getItemCount(){
