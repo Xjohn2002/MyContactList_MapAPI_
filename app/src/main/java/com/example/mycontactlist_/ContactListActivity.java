@@ -29,16 +29,17 @@ public class ContactListActivity extends AppCompatActivity {
         });
 
         // Listing 6.3
+        //Modified for listing 6.8
         ContactDataSource ds = new ContactDataSource(this);
-        ArrayList<String> names;
+        ArrayList<Contact> contacts;
         try {
             ds.open();
-            names = ds.getContactName();
+            contacts = ds.getContacts();
             ds.close();
             RecyclerView contactList = findViewById(R.id.rvContacts);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
             contactList.setLayoutManager(layoutManager);
-            ContactAdapter contactAdapter = new ContactAdapter(names);
+            ContactAdapter contactAdapter = new ContactAdapter(contacts);
             contactList.setAdapter(contactAdapter);
         }
         catch (Exception e){
@@ -46,15 +47,20 @@ public class ContactListActivity extends AppCompatActivity {
     }
 
     //Listing 6.5
-    private View.OnClickListener onItemClickListener = new View.OnClickListener() {
+    //Modified for listing 6.8
+
+        private View.OnClickListener onItemClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder)
                     view.getTag();
             int position = viewHolder.getAdapterPosition();
+            int contactId = contacts.get(position).getContactID();
             Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
+            intent.putExtra("contactID",contactID);
             startActivity(intent);
         }
+
     };
 
 }
