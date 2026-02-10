@@ -47,7 +47,15 @@ public class MainActivity extends AppCompatActivity {
         initSaveButton();
         initTextChangedEvents();
 
-        currentContact = new Contact();
+        // Listing 6.11 onCreate code to get and use passed ID
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            initContact(extras.getInt("contactid"));
+        }
+        else{
+            currentContact = new Contact();
+        }
+
     }
 
     private void initListButton(){
