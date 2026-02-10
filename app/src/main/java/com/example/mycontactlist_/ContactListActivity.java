@@ -3,6 +3,7 @@ package com.example.mycontactlist_;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -27,6 +28,7 @@ public class ContactListActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        initAddContactButton();
 
         // Listing 6.3
         //Modified for listing 6.8
@@ -42,9 +44,24 @@ public class ContactListActivity extends AppCompatActivity {
             ContactAdapter contactAdapter = new ContactAdapter(contacts);
             contactList.setAdapter(contactAdapter);
         }
-        catch (Exception e){
+        catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
+        }
     }
+
+
+    // Listing 6.12 initAddContactButton() Method
+    private void initAddContactButton(){
+        Button newContact = findViewById(R.id.buttonAddContact);
+        newContact.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+
 
     //Listing 6.5
     //Modified for listing 6.8
@@ -63,4 +80,3 @@ public class ContactListActivity extends AppCompatActivity {
 
     };
 
-}
