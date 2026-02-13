@@ -74,11 +74,17 @@ public class ContactMapActivity extends AppCompatActivity {
                     Toast.makeText(getBaseContext(),"Error,Location not available",
                             Toast.LENGTH_LONG).show();
                 }
-
-
-
-
             }
         });
+    }
+    //Listing 7.4 onPause Method
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            locationManager.removeUpdates(gpsListener);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
