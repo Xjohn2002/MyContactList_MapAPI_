@@ -10,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -30,6 +32,7 @@ public class ContactMapActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     LocationListener gpsListener;
+    final int PERMISSION_REQUEST_LOCATION = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +46,53 @@ public class ContactMapActivity extends AppCompatActivity {
         });
     }
 
-    //Listing 7.1 Code to look up adress coords(Listing 7.3 moved from onClick Method)
+    //Listing 7.1 Code to look up address coords(Listing 7.3 moved from onClick Method)
+    //listing 7.6 code moved into OnClick method
     private void initGetLocationButton() {
         Button locationButton = (Button) findViewById(R.id.buttonGetLocation);
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try {
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        if (ContextCompat.checkSelfPermission(ContactMapActivity.this,
+                                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                    ContactMapActivity.this,
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                            )) {
+                                Snackbar.make(findViewById(R.id.activity_contact_map),
+                                                "MyContactList requires this permission to locate " +
+                                                        "your contacts", Snackbar.LENGTH_INDEFINITE)
+                                        .setAction("Ok", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                ActivityCompat.requestPermissions(
+                                                        ContactMapActivity.this,
+                                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                                        PERMISSION_REQUEST_LOCATION
+                                                );
 
+                                            }
+                                        })
+                                        .show();
+
+                            } else {
+                                ActivityCompat.requestPermissions(
+                                        ContactMapActivity.this,
+                                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                        PERMISSION_REQUEST_LOCATION);
+                            }
+                        } else {
+                            startLocationUpdates();
+                        }
+                    } else {
+                        startLocationUpdates();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getBaseContext(), "Error requesting permission",
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -98,4 +141,5 @@ public class ContactMapActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(),"Error,Location not available",
                         Toast.LENGTH_LONG).show();
             }
+
 }
