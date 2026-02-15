@@ -110,7 +110,7 @@ public class ContactMapActivity extends AppCompatActivity {
     private void startLocationUpdates() {
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return ;
+            return;
             //Listing 7.3 code moved here
             try {
                 locationManager = (LocationManager) getBaseContext().getSystemService(Context.LOCATION_SERVICE);
@@ -136,10 +136,25 @@ public class ContactMapActivity extends AppCompatActivity {
                 locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
 
-            }
-            catch (Exception e){
-                Toast.makeText(getBaseContext(),"Error,Location not available",
+            } catch (Exception e) {
+                Toast.makeText(getBaseContext(), "Error,Location not available",
                         Toast.LENGTH_LONG).show();
             }
-
+        }
+    }
+    // Listing 7.7 Method to respond to permission requests
+    @Override
+    public void onRequestPermissionsResult (int requestCode, String permissions[], int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startLocationUpdates();
+                } else  {
+                    Toast.makeText(ContactMapActivity.this, "MyContactList will not locate your contacts",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
 }
