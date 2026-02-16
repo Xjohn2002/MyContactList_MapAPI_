@@ -30,8 +30,12 @@ import java.util.List;
 
 public class ContactMapActivity extends AppCompatActivity {
 
+
+    Location currentBestLocation;
     LocationManager locationManager;
     LocationListener gpsListener;
+
+    LocationListener networkListener;
     final int PERMISSION_REQUEST_LOCATION = 101;
 
     @Override
@@ -96,10 +100,27 @@ public class ContactMapActivity extends AppCompatActivity {
             }
         });
     }
+    //Listing 7.8 isBetterLocation Method
+    private boolean isBetterLocation(Location location) {
+        boolean isBetter = false;
+        if (currentBestLocation == null) {
+            isBetter = true;
+        } else if (location.getAccuracy() <= currentBestLocation.getAccuracy()) {
+            isBetter = true;
+        } else if (location.getTime() - currentBestLocation.getTime() > 5 * 60 * 1000) {
+            isBetter = true;
+        }
+        return isBetter;
+    }
+
     //Listing 7.4 onPause Method
     @Override
     public void onPause() {
         super.onPause();
+        /*if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return ;*/
+
         try {
             locationManager.removeUpdates(gpsListener);
         } catch (Exception e) {
