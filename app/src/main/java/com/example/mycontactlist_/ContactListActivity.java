@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,92 +20,72 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class ContactListActivity extends AppCompatActivity {
-
-
-    //Listing 6.5
-    //Modified for listing 6.8
-
+    ArrayList<Contact>contacts;
     private View.OnClickListener onItemClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder)
-                    view.getTag();
-            int position = viewHolder.getAbsoluteAdapterPosition();
-            // replaced getAdapterPosition() w/ getAbsoluteAdapterPosition()
+            RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) view.getTag();
+            int position = viewHolder.getAdapterPosition();
             int contactId = contacts.get(position).getContactID();
             Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
-            intent.putExtra("contactID",contactId);
-            // was "contactID" in line 110 a typo?
-            // replaced w/ "contactId"
+            intent.putExtra("contactid", contactId);
             startActivity(intent);
         }
-
     };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_contact_list);
+
+        initAddContactButton();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        initAddContactButton();
 
-        String sortBy = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortfield","contactname");
-        String sortOrder = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortorder","ASC");
 
-        // Listing 6.3
-        //Modified for listing 6.8
-        ContactDataSource ds = new ContactDataSource(this);
-        ArrayList<Contact> contacts;
-        try {
-            ds.open();
-            contacts = ds.getContacts(sortBy,sortOrder);
-            ds.close();
-            RecyclerView contactList = findViewById(R.id.rvContacts);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-            contactList.setLayoutManager(layoutManager);
-            ContactAdapter contactAdapter = new ContactAdapter(contacts);
-            contactList.setAdapter(contactAdapter);
-        }
-        catch (Exception e) {
-            Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
-        }
     }
-    // Listing 6.16 onResume Method ( Modified to check for contacts; Listing 6.18)
+
     @Override
-    public void onResume() {
+    public void onResume(){
         super.onResume();
-        String sortBy = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortfield", "contactname");
-        String sortOrder = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortorder", "ASC");
+        String sortBy = getSharedPreferences("MyContactListPreferences",Context.MODE_PRIVATE).getString("sortfield", "contactname");
+
+        String sortOrder = getSharedPreferences("MyContactListPreferences", Context.MODE_PRIVATE).getString("sortorder", "ASC");
         ContactDataSource ds = new ContactDataSource(this);
+
+
         try {
             ds.open();
             contacts = ds.getContacts(sortBy, sortOrder);
             ds.close();
+
             if (contacts.size() > 0) {
+
                 RecyclerView contactList = findViewById(R.id.rvContacts);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
                 contactList.setLayoutManager(layoutManager);
-                contactAdapter = new ContactAdapter(names);
+
+                ContactAdapter contactAdapter = new ContactAdapter(contacts, onItemClickListener, this);
                 contactList.setAdapter(contactAdapter);
+
+
+                initDeleteSwitch(contactAdapter);
+
             } else {
                 Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
                 startActivity(intent);
             }
+
         } catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
         }
     }
+
+
 
 
     // Listing 6.12 initAddContactButton() Method
@@ -113,6 +95,17 @@ public class ContactListActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
                 startActivity(intent);
+            }
+        });
+    }
+    private void initDeleteSwitch(ContactAdapter contactAdapter) {
+        Switch s = findViewById(R.id.switchDelete);
+        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged (CompoundButton compoundButton, boolean b) {
+                Boolean status = compoundButton.isChecked();
+                contactAdapter.setDelete(status);
+                contactAdapter.notifyDataSetChanged();
             }
         });
     }
