@@ -135,7 +135,8 @@ public class ContactDataSource {
         return contact;
     }
     //Listing 6.13 delete contact Method
-    private Boolean deleteContact(int contactId) {
+    public Boolean deleteContact(int contactId) {
+        //made method public instead of private to fix error in ContactAdapter
         boolean didDelete = false;
         try {
             didDelete = database.delete("contact", "_id=" + contactId, null) > 0;

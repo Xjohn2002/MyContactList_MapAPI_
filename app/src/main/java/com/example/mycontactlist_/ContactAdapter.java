@@ -1,5 +1,6 @@
 package com.example.mycontactlist_;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +27,7 @@ public class ContactAdapter extends RecyclerView.Adapter {
     private boolean isDeleting;
     private Context parentContext;
 
-    public ContactAdapter(ArrayList<Contact> arrayList, Context context){
+    public ContactAdapter(ArrayList<Contact> arrayList, View.OnClickListener onItemClickListener, Context context){
         contactData = arrayList;
         parentContext = context;
     }
@@ -56,9 +57,7 @@ public class ContactAdapter extends RecyclerView.Adapter {
 
         }
     }
-    public ContactAdapter(ArrayList<String> arrayList){
-        contactData = arrayList;
-    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType){
@@ -67,10 +66,12 @@ public class ContactAdapter extends RecyclerView.Adapter {
         return new ContactViewHolder(v);
     }
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position){
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder,  @SuppressLint("RecyclerView")int position){
         ContactViewHolder cvh = (ContactViewHolder) holder;
         cvh.getContactTextView().setText(contactData.get(position).getContactName());
-        cvh.getPhoneTextView().setText(contactData.get(position).getPhoneNumber);
+        cvh.getPhoneTextView().setText(contactData.get(position).getPhoneNumber());
+
+
         if (isDeleting){
             cvh.getDeleteButton().setVisibility(View.VISIBLE);
             cvh.getDeleteButton().setOnClickListener(new View.OnClickListener() {
@@ -84,6 +85,11 @@ public class ContactAdapter extends RecyclerView.Adapter {
             cvh.getDeleteButton().setVisibility(View.INVISIBLE);
         }
     }
+    @Override
+    public int getItemCount(){
+        return contactData.size();
+    }
+
     public void setDelete(boolean b){
         isDeleting = b;
     }
@@ -106,21 +112,5 @@ public class ContactAdapter extends RecyclerView.Adapter {
         }
 
     }
-    @Override
-    public int getItemCount(){
-        return contactData.size();
-    }
 
-    //Listing 6.15 initDeleteSwitch
-    private void  initDeleteSwitch(){
-        Switch s = findViewById(R.id.switchDelete);
-        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Boolean status = compoundButton.isChecked();
-                contactAdapter.setDelete(status);;
-                contactAdapter.notifyDataSetChanged();
-            }
-        });
-    }
 }

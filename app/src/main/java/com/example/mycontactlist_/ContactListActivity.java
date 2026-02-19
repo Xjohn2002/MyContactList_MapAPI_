@@ -98,6 +98,7 @@ public class ContactListActivity extends AppCompatActivity {
             }
         });
     }
+    //Listing 6.15 initDeleteSwitch
     private void initDeleteSwitch(ContactAdapter contactAdapter) {
         Switch s = findViewById(R.id.switchDelete);
         s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
