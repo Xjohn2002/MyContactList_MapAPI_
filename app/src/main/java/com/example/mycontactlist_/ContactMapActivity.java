@@ -31,6 +31,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -67,67 +68,111 @@ public class ContactMapActivity extends AppCompatActivity implements
         initSettingsButton();
         initMapButton();
 
-        });
+        }
+    }
+
+    //Listing 7.12 Methods to capture location
+    private void createLocationRequest(){
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+    private void createLocationCallback() {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return ;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    Toast.makeText(getBaseContext(), "LAT: " + location.getLatitude() +
+                            "LONG: " + location.getLongitude() + "ACCURACY: " + location.getAccuracy(), Toast.LENGTH_LONG).show();
+                }
+            }
+        };
     }
 
 
-    //Listing 7.5 Code for startLocationUpdate
+    /// Get the permissions and if enabled set location
     private void startLocationUpdates() {
-        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >=23 && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
             return ;
         }
-
-        //Listing 7.3 code moved here
-        try {
-            locationManager = (LocationManager) getBaseContext().getSystemService(Context.LOCATION_SERVICE);
-            gpsListener = new LocationListener() {
-                public void onLocationChanged(Location location) {
-                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
-                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
-                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
-
-                    if (isBetterLocation(location)) {
-                        currentBestLocation = location;
-
-                        txtLatitude.setText(String.valueOf(currentBestLocation.getLatitude()));
-                        txtLongitude.setText(String.valueOf(currentBestLocation.getLongitude()));
-                        txtAccuracy.setText(String.valueOf(currentBestLocation.getAccuracy()));
-                    }
-                }
-                public void onStatusChanged(String provider, int status, Bundle extras){}
-                public void onProviderEnabled(String provider) {}
-                public void onProviderDisabled(String provider){}
-            };
-
-            networkListener = new LocationListener() {
-                public void onLocationChanged(Location location) {
-                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
-                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
-                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
-
-                    if (isBetterLocation(location)) {
-
-                        currentBestLocation = location;
-
-                        txtLatitude.setText(String.valueOf(currentBestLocation.getLatitude()));
-                        txtLongitude.setText(String.valueOf(currentBestLocation.getLongitude()));
-                        txtAccuracy.setText(String.valueOf(currentBestLocation.getAccuracy()));
-                    }
-                }
-                public void onStatusChanged(String provider, int status, Bundle extras){}
-                public void onProviderEnabled(String provider) {}
-                public void onProviderDisabled(String provider){}
-            };
-
-
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkListener);
-        } catch (Exception e) {
-            Toast.makeText(getBaseContext(), "Error, Location not available", Toast.LENGTH_LONG).show();
-
-        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+                locationCallback, null);
+        gmap.setMyLocationEnabled(true);
     }
+
+    ///  Stops location and removes from device
+    private void stopLocationUpdates () {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(getBaseContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+    /// Creating map instance
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        gmap = googleMap;
+        gmap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        //Listing 7.6 permission request code moved here
+        try {
+            if (Build.VERSION.SDK_INT >= 23) {
+                if (ContextCompat.checkSelfPermission(ContactMapActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(
+                            ContactMapActivity.this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    )) {
+                        Snackbar.make(findViewById(R.id.activity_contact_map),
+                                        "MyContactList requires this permission to locate " +
+                                                "your contacts", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Ok", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        ActivityCompat.requestPermissions(
+                                                ContactMapActivity.this,
+                                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                                PERMISSION_REQUEST_LOCATION
+                                        );
+
+                                    }
+                                })
+                                .show();
+
+                    } else {
+                        ActivityCompat.requestPermissions(
+                                ContactMapActivity.this,
+                                new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                PERMISSION_REQUEST_LOCATION);
+                    }
+                } else {
+                    startLocationUpdates();
+                }
+            } else {
+                startLocationUpdates();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), "Error requesting permission",
+                    Toast.LENGTH_LONG).show();
+        }
+
+
+    }
+
+
+
+
+
+
+
 
     // Listing 7.7 Method to respond to permission requests
     @Override
@@ -159,72 +204,10 @@ public class ContactMapActivity extends AppCompatActivity implements
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 
-    //Listing 7.1 Code to look up address coords(Listing 7.3 moved from onClick Method)
-    //listing 7.6 code moved into OnClick method
-    private void initGetLocationButton() {
-        Button locationButton = (Button) findViewById(R.id.buttonGetLocation);
-        locationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        if (ContextCompat.checkSelfPermission(ContactMapActivity.this,
-                                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                                    ContactMapActivity.this,
-                                    Manifest.permission.ACCESS_FINE_LOCATION
-                            )) {
-                                Snackbar.make(findViewById(R.id.activity_contact_map),
-                                                "MyContactList requires this permission to locate " +
-                                                        "your contacts", Snackbar.LENGTH_INDEFINITE)
-                                        .setAction("Ok", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                ActivityCompat.requestPermissions(
-                                                        ContactMapActivity.this,
-                                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                                        PERMISSION_REQUEST_LOCATION
-                                                );
-
-                                            }
-                                        })
-                                        .show();
-
-                            } else {
-                                ActivityCompat.requestPermissions(
-                                        ContactMapActivity.this,
-                                        new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        PERMISSION_REQUEST_LOCATION);
-                            }
-                        } else {
-                            startLocationUpdates();
-                        }
-                    } else {
-                        startLocationUpdates();
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(getBaseContext(), "Error requesting permission",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 
 
-    // Listing 7.8  isBetterLocation Method
-    private boolean isBetterLocation(Location location) {
-        boolean isBetter = false;
-        if (currentBestLocation == null) {
-            isBetter = true;
-        } else if (location.getAccuracy() <= currentBestLocation.getAccuracy()) {
-            isBetter = true;
-        } else if (location.getTime() - currentBestLocation.getTime() > 5 * 60 * 1000) {
-            isBetter = true;
-        }
-        return isBetter;
-    }
 
     private void initListButton(){
         ImageButton ibList=findViewById(R.id.imageButtonList);
