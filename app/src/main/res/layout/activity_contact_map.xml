@@ -8,169 +8,19 @@
     android:id="@+id/activity_contact_map"
     tools:context=".ContactMapActivity">
 
-    <Button
-        android:id="@+id/buttonGetLocation"
-        android:layout_width="183dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="204dp"
-        android:text="Get Location"
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_alignParentTop="true"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editCity"
-        app:layout_constraintVertical_bias="0.072" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/textLatitude"
-        android:layout_width="113dp"
-        android:layout_height="35dp"
-        android:layout_marginEnd="164dp"
-        android:layout_marginBottom="16dp"
-        android:text="none"
-        app:layout_constraintBottom_toTopOf="@+id/textLongitude"
-        app:layout_constraintEnd_toEndOf="parent" />
+    </fragment>
 
-    <TextView
-        android:id="@+id/tvLatitude"
-        android:layout_width="84dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginBottom="16dp"
-        android:text="Latitude"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvLongitude"
-        app:layout_constraintEnd_toStartOf="@+id/textLatitude"
-        app:layout_constraintHorizontal_bias="0.047"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/editZipCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="8dp"
-        android:ems="5"
-        android:hint="Zipcode"
-        android:imeOptions="actionNext"
-        android:inputType="number"
-        android:minHeight="48dp"
-        android:nextFocusDown="@+id/editHome"
-        app:layout_constraintStart_toEndOf="@+id/editState"
-        app:layout_constraintTop_toBottomOf="@+id/editAddress">
-
-    </EditText>
-
-    <EditText
-        android:id="@+id/editState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginBottom="16dp"
-        android:ems="2"
-        android:hint="State"
-        android:imeOptions="actionNext"
-        android:inputType="textCapCharacters"
-        android:minWidth="48dp"
-        android:minHeight="48dp"
-        android:nextFocusDown="@+id/editZipCode"
-        app:layout_constraintBottom_toTopOf="@+id/textCell"
-        app:layout_constraintEnd_toStartOf="@+id/editZipCode"
-        app:layout_constraintStart_toEndOf="@+id/editCity"
-        app:layout_constraintTop_toBottomOf="@+id/editAddress">
-
-    </EditText>
-
-    <EditText
-        android:id="@+id/editCity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="9"
-        android:hint="City"
-        android:imeOptions="actionNext"
-        android:inputType="textCapWords"
-        android:minHeight="48dp"
-        android:nextFocusDown="@+id/editState"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editAddress">
-
-    </EditText>
-
-    <EditText
-        android:id="@+id/editAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="16"
-        android:hint="Enter Street Adress"
-        android:imeOptions="actionNext"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAddress">
-
-    </EditText>
-
-    <TextView
-        android:id="@+id/textAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Address:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editName" />
-
-    <TextView
-        android:id="@+id/textAccuracy"
-        android:layout_width="113dp"
-        android:layout_height="35dp"
-        android:layout_marginEnd="164dp"
-        android:layout_marginBottom="208dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/textLongitude"
-        android:layout_width="113dp"
-        android:layout_height="35dp"
-        android:layout_marginEnd="164dp"
-        android:layout_marginBottom="16dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/textAccuracy"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
-    <TextView
-        android:id="@+id/tvAccuracy"
-        android:layout_width="84dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="208dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
-        app:layout_constraintEnd_toStartOf="@+id/textAccuracy"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/tvLongitude"
-        android:layout_width="84dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="Longitude"
-        app:layout_constraintBottom_toTopOf="@+id/tvAccuracy"
-        app:layout_constraintEnd_toStartOf="@+id/textLongitude"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/linearLayout5"
