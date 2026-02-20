@@ -38,6 +38,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 //Listing 7.11 Code to set up GoogleMaps
@@ -51,10 +52,30 @@ public class ContactMapActivity extends AppCompatActivity implements
     LocationRequest locationRequest;
     LocationCallback locationCallback;
 
+    ArrayList<Contact> contacts = new ArrayList<>();
+    Contact currentContact = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_map);
+
+        //Listing 7.14 getting data for the map
+        Bundle extras = getIntent().getExtras();
+        try {
+            ContactDataSource ds = new ContactDataSource(ContactMapActivity.this);
+            ds.open();
+            if (extras != null) {
+                currentContact = ds.getSpecificContact(extras.getInt("contactid"));
+
+            } else {
+                contacts = ds.getContacts("contactname", "ASC");
+            }
+            ds.close();
+        } catch (Exception e) {
+            Toast.makeText(this, "Contact(s) could not be retrieved.", Toast.LENGTH_LONG).show();
+        }
+
         fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment)
