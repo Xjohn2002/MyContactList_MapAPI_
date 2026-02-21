@@ -20,6 +20,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +57,7 @@ public class ContactMapActivity extends AppCompatActivity implements
         OnMapReadyCallback {
 
     final int PERMISSION_REQUEST_LOCATION = 101;
-    GoogleMap gMap;
+    GoogleMap gmap;
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
@@ -95,7 +97,7 @@ public class ContactMapActivity extends AppCompatActivity implements
 
         initListButton();
         initSettingsButton();
-        initMapButton();
+        initMapTypeButtons();
 
         }
     }
@@ -150,6 +152,10 @@ public class ContactMapActivity extends AppCompatActivity implements
     public void onMapReady(GoogleMap googleMap) {
         gmap = googleMap;
         gmap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        RadioButton rbNormal = findViewById(R.id.radioButtonNormal);
+        rbNormal.setChecked (true);
+
 
 
         //Listing 7.15 Code to put markers on a Map
@@ -316,6 +322,22 @@ public class ContactMapActivity extends AppCompatActivity implements
         }
 
     }
+
+/// Radio buttons
+private void initMapTypeButtons() {
+    RadioGroup rgMapType = findViewById(R.id.radioGroupMapType);
+    rgMapType.setOnCheckedChangeListener (new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup radioGroup, int i) {
+            RadioButton rbNormal = findViewById(R.id.radioButtonNormal);
+            if (rbNormal.isChecked()) {
+                gmap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            } else {
+                gmap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            }
+        }
+    });
+}
 
 
 

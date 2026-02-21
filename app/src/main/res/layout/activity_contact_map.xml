@@ -54,4 +54,25 @@
             app:srcCompat="@drawable/settingsicon" />
     </LinearLayout>
 
+    <RadioGroup
+        android:id="@+id/radioGroupMapType"
+        android:layout_width="130dp"
+        android:layout_height="97dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="@+id/map"
+        tools:layout_editor_absoluteY="16dp">
+
+        <RadioButton
+            android:id="@+id/radioButtonNormal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Normal" />
+
+        <RadioButton
+            android:id="@+id/radioButtonSatellite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Satellite" />
+    </RadioGroup>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
