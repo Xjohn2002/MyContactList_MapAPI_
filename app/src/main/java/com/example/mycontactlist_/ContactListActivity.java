@@ -1,12 +1,16 @@
 package com.example.mycontactlist_;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -38,6 +42,21 @@ public class ContactListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_contact_list);
+
+
+        //Listing 8.2 Monitering the battery
+        BroadcastReceiver batteryReceiver =new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                double batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL,0);
+                double levelScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE,0);
+                int batteryPercent = (int) Math.floor(batteryLevel / levelScale * 100);
+                TextView textBatteryState = (TextView) findViewById(R.id.textBatteryLevel);
+                textBatteryState.setText(batteryPercent+ "%");
+            }
+        };
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryReceiver, filter);
 
         initAddContactButton();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -84,8 +103,6 @@ public class ContactListActivity extends AppCompatActivity {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
         }
     }
-
-
 
 
     // Listing 6.12 initAddContactButton() Method
