@@ -1,8 +1,13 @@
 package com.example.mycontactlist_;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -82,6 +87,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    //Listing 8.7 Check for Phone permission
+    private void checkPhonePermission(String phoneNumber){
+        if(Build.VERSION.SDK_INT>=23)
+        {
+            if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+            {
+                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.CALL_PHONE))
+                {
+                    Snackbar.make(findViewById(R.id.activity_main),"MyContactList requires this permission to place a call",Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CALL_PHONE},
+                                    PERMISSION_REQUEST_PHONE);
+                        }
+                    }).show();
+                }
+                else
+                { callContact(phoneNumber);
+                }
+            }
+            else{
+                callContact(phoneNumber);
+            }
+        }
+    }
+
+
 
     private void initListButton(){
         ImageButton ibList = findViewById(R.id.imageButtonList);
