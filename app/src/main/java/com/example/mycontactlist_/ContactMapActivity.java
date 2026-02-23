@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -124,9 +126,54 @@ public class ContactMapActivity extends AppCompatActivity implements
         initListButton();
         initSettingsButton();
         initMapTypeButtons();
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
 
-        }
+
+        });
     }
+
+    //Listing 8.5 sensorEventListener code
+    private SensorEventListener mySensorEventListener = new SensorEventListener() {
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) { }
+
+        float[] accelerometerValues;
+        float[] magneticValues;
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            if(event.sensor.getType()== Sensor.TYPE_ACCELEROMETER)
+                accelerometerValues = event.values;
+            if(event.sensor.getType()== Sensor.TYPE_MAGNETIC_FIELD)
+                magneticValues = event.values;
+
+            if(accelerometerValues != null && magneticValues != null){
+                float R[] = new float[9];
+                float I[] = new float[9];
+
+                boolean success = sensorManager.getRotationMatrix(R,I,
+                        accelerometerValues,magneticValues);
+                if(success){
+                    float orientation[]= new float[3];
+                    SensorManager.getOrientation(R,orientation);
+
+                    float azimut = (float) Math.toDegrees(orientation[0]);
+                    if(azimut <0.0f){azimut+=360.0f;}
+                    String direction;
+                    if(azimut>=315||azimut<45){ direction ="N";}
+                    else if (azimut>=225 && azimut<315){ direction ="W";}
+                    else if (azimut>=135 && azimut<225){ direction ="W";}
+                    else{direction = "E";}
+                    textDirection.setText(direction);
+
+
+                }
+            }
+        }
+    };
 
     //Listing 7.12 Methods to capture location
     private void createLocationRequest(){
@@ -391,5 +438,3 @@ private void initMapTypeButtons() {
         });
     }
 
-
-}
