@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         initChangeDateButton();
         initSaveButton();
         initTextChangedEvents();
+        initCallFunction();
 
         // Listing 6.11 onCreate code to get and use passed ID
         Bundle extras = getIntent().getExtras();
@@ -56,6 +57,30 @@ public class MainActivity extends AppCompatActivity {
             currentContact = new Contact();
         }
 
+    }
+
+
+
+
+    //Listing 8.6 initlilze longClickListener
+    private void initCallFunction(){
+        EditText editPhone = (EditText) findViewById(R.id.editHome);
+        editPhone.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View arg0) {
+                checkPhonePermission(currentContact.getPhoneNumber());
+                return false;
+            }
+        });
+        EditText editCell = (EditText) findViewById(R.id.editCell);
+        editCell.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View arg0) {
+                checkPhonePermission(currentContact.getCellNumber());
+                return false;
+
+            }
+        });
     }
 
     private void initListButton(){
