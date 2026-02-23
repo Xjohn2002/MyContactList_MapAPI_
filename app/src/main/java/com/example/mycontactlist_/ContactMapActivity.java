@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -58,6 +60,14 @@ public class ContactMapActivity extends AppCompatActivity implements
 
     final int PERMISSION_REQUEST_LOCATION = 101;
     GoogleMap gmap;
+
+    SensorManager sensorManager;
+
+    Sensor accelerometer;
+
+    Sensor magnetometer;
+
+    TextView textDirection;
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
@@ -91,6 +101,22 @@ public class ContactMapActivity extends AppCompatActivity implements
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+//Listing 8.4
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        if (accelerometer != null && magnetometer != null) {
+            sensorManager.registerListener(mySensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+
+            sensorManager.registerListener(mySensorEventListener, magnetometer,
+                    SensorManager.SENSOR_DELAY_FASTEST);
+        } else {
+            Toast.makeText(this, "Sensors not found", Toast.LENGTH_LONG).show();
+        }
+
+        textDirection = (TextView) findViewById(R.id.textHeading);
 
         createLocationRequest();
         createLocationCallback();
