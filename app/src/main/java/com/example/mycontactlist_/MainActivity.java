@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Contact currentContact;
     final int PERMISSION_REQUEST_PHONE = 102;
+    final int PERMISSION_REQUEST_CAMERA = 103;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+// Listing 8.11 Image Button Initilizaion Method
+    private void initImageButton() {
+        ImageButton ib = findViewById(R.id.imageContact);
+        ib.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= 23) {
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CAMERA)) {
+                        Snackbar.make(findViewById(R.id.activity_main),
+                                        "This app needs permission to take pictures", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("OK", v1 -> ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA))
+                                .show();
+                    } else {
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
+                    }
+                } else {
+                    takePhoto();
+                }
+            } else {
+                takePhoto();
+            }
+        });
+    }
+
 
 
 
@@ -224,12 +250,16 @@ public class MainActivity extends AppCompatActivity {
         editEmail.setEnabled(enabled);
         buttonChange.setEnabled(enabled);
         buttonSave.setEnabled(enabled);
+        ImageButton picture = findViewById(R.id.imageContact);
+
+        picture.setEnabled(enabled);
 
         if (enabled){
             editName.requestFocus();
             editHome.setInputType(InputType.TYPE_CLASS_PHONE);
             //editHome is same as editPhone In book
             editCell.setInputType(InputType.TYPE_CLASS_PHONE);
+
         }
         else{
             ScrollView s = findViewById(R.id.scrollView);
