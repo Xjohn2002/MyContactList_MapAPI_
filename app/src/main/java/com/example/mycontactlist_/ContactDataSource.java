@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -37,6 +39,14 @@ public class ContactDataSource {
             initialValues.put("cellnumber",c.getCellNumber());
             initialValues.put("email",c.getEMail());
             initialValues.put("birthday",String.valueOf (c.getBirthday().getTimeInMillis()));
+
+            // Listing 8.16 Save picture to Database
+            if (c.getPicture() != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                c.getPicture().compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] photo = baos.toByteArray();
+                initialValues.put("contactphoto", photo);
+            }
 
             didSucceed = database.insert("contact",null, initialValues) >0;
         }
@@ -163,6 +173,14 @@ public class ContactDataSource {
             updateValues.put("cellnumber",c.getCellNumber());
             updateValues.put("email",c.getEMail());
             updateValues.put("birthday",String.valueOf (c.getBirthday().getTimeInMillis()));
+
+            // Listing 8.16
+            if (c.getPicture() != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                c.getPicture().compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] photo = baos.toByteArray();
+                updateValues.put("contactphoto", photo);
+            }
 
             didSucceed = database.update("contact",updateValues,"_id=" + rowId, null) >0;
         }
