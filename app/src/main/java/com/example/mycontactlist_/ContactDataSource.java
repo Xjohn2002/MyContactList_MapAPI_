@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -125,6 +127,17 @@ public class ContactDataSource {
         // is "contactID"  in line 114 a typo?
         //attempted to replace w/ contactId
         Cursor cursor = database.rawQuery(query, null);
+
+        //Listing 8.17 Getting a picture from the Database
+        byte[] photo = cursor.getBlob(10);
+        if (photo != null) {
+            ByteArrayInputStream imageStream = new ByteArrayInputStream(photo);
+            Bitmap thePicture = BitmapFactory.decodeStream(imageStream);
+            contact.setPicture(thePicture);
+
+        }
+
+
 
         if (cursor.moveToFirst()){
             contact.setContactID(cursor.getInt(0));

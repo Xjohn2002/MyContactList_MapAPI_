@@ -444,6 +444,15 @@ public class MainActivity extends AppCompatActivity {
         EditText editEmail = findViewById(R.id.editEMail);
         TextView birthDay = findViewById(R.id.textBirthday);
 
+        // Listing 8.18 display the photo
+        ImageButton picture = (ImageButton) findViewById(R.id.imageContact);
+        if (currentContact.getPicture() != null) {
+            picture.setImageBitmap(currentContact.getPicture());
+        } else {
+            picture.setImageResource(R.drawable.photoicon);
+        }
+
+
         editName.setText(currentContact.getContactName());
         editAddress.setText(currentContact.getStreetAddress());
         editCity.setText(currentContact.getCity());
