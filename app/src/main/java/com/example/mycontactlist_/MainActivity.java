@@ -3,8 +3,11 @@ package com.example.mycontactlist_;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -32,13 +35,14 @@ import androidx.fragment.app.FragmentManager;
 public class MainActivity extends AppCompatActivity {
 
     private Contact currentContact;
+    final int PERMISSION_REQUEST_PHONE = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -112,6 +116,34 @@ public class MainActivity extends AppCompatActivity {
                 callContact(phoneNumber);
             }
         }
+    }
+
+    //Listing 8.8 Handling Phone Permission Request
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_PHONE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(MainActivity.this, "You may now call from this app", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "You will not be able to call", Toast.LENGTH_LONG).show();
+                }
+            }
+
+        }
+    }
+    //Listing 8.9
+    private void callContact(String phoneNumber){
+        Intent intent=new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:"+phoneNumber));
+        if (Build.VERSION.SDK_INT>=23 && ContextCompat.checkSelfPermission(getBaseContext(),
+                Manifest.permission.CALL_PHONE)!=
+                PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        else
+            startActivity(intent);
     }
 
 
