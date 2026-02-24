@@ -4,9 +4,11 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -27,6 +29,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -38,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private Contact currentContact;
     final int PERMISSION_REQUEST_PHONE = 102;
     final int PERMISSION_REQUEST_CAMERA = 103;
+    final int CAMERA_REQUEST=1888;
+
+    private ActivityResultLauncher<Intent> cameraLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,17 @@ public class MainActivity extends AppCompatActivity {
         initSaveButton();
         initTextChangedEvents();
         initCallFunction();
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Bitmap photo = (Bitmap) result.getData().getExtras().get("data");
+                        Bitmap scaledPhoto = Bitmap.createScaledBitmap(photo, 144, 144, true);
+                        ImageButton imageButton = findViewById(R.id.imageContact);
+                        imageButton.setImageBitmap(scaledPhoto);
+                        currentContact.setPicture(scaledPhoto);
+                    }
+                });
 
         // Listing 6.11 onCreate code to get and use passed ID
         Bundle extras = getIntent().getExtras();
@@ -92,6 +110,25 @@ public class MainActivity extends AppCompatActivity {
                 takePhoto();
             }
         });
+    }
+
+    //Listing 8.13 Starting the Camera and Capturing the result
+    private void takePhoto() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraLauncher.launch(cameraIntent);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                Bitmap scaledPhoto = Bitmap.createScaledBitmap(photo, 144, 144, true);
+                ImageButton imageContact = (ImageButton) findViewById(R.id.imageContact);
+                imageContact.setImageBitmap(scaledPhoto);
+                currentContact.setPicture(scaledPhoto);
+            }
+        }
     }
 
 
@@ -156,6 +193,15 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(MainActivity.this, "You will not be able to call", Toast.LENGTH_LONG).show();
                 }
+            }
+            //Listing 8.12 Handling Camera Permission request
+            case PERMISSION_REQUEST_CAMERA: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    takePhoto();
+                } else {
+                    Toast.makeText(MainActivity.this, "You will not be able to save contact pics", Toast.LENGTH_LONG).show();
+                }
+                break;
             }
 
         }
