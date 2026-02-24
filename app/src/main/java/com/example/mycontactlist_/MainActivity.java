@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -215,18 +216,27 @@ public class MainActivity extends AppCompatActivity {
         editCity.setEnabled(enabled);
         editState.setEnabled(enabled);
         editZipCode.setEnabled(enabled);
-        editHome.setEnabled(enabled);
+
+        /*editHome.setEnabled(enabled);
         editCell.setEnabled(enabled);
+         */
+
         editEmail.setEnabled(enabled);
         buttonChange.setEnabled(enabled);
         buttonSave.setEnabled(enabled);
 
         if (enabled){
             editName.requestFocus();
+            editHome.setInputType(InputType.TYPE_CLASS_PHONE);
+            //editHome is same as editPhone In book
+            editCell.setInputType(InputType.TYPE_CLASS_PHONE);
         }
         else{
             ScrollView s = findViewById(R.id.scrollView);
             s.fullScroll(ScrollView.FOCUS_UP);
+            editHome.setInputType(InputType.TYPE_NULL);
+            //editHome is same as editPhone In book
+            editCell.setInputType(InputType.TYPE_NULL);
         }
     }
     private void initChangeDateButton(){
